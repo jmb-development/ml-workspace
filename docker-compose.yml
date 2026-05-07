@@ -9,7 +9,10 @@ services:
 
   # ── GPU Worker & Job Queue ─────────────────────────────────────────────────
   ray-head:
-    image: rayproject/ray:latest-gpu
+    build:
+      context: .
+      dockerfile: ray.Dockerfile
+    image: ml-ray:latest
     command: >
       bash -c "ray start --head
                          --dashboard-host=0.0.0.0
