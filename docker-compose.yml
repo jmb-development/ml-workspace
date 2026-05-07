@@ -1,0 +1,50 @@
+networks:
+  ml-net:
+    name: ml-net
+
+volumes:
+  jupyterhub-data:   # Stores user accounts, auth DB
+
+services:
+
+  # ── GPU Worker & Job Queue ─────────────────────────────────────────────────
+  ray-head:
+    image: rayproject/ray:latest-gpu
+    command: >
+      bash -c "ray start --head
+                         --dashboard-host=0.0.0.0
+                         --dashboard-port=8265
+                         --ray-client-server-port=10001
+                         --block"
+    ports:
+      - "8265:8265"    # Ray dashboard  (expose via Cloudflare tunnel if desired)
+    networks:
+      - ml-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # ── JupyterHub (login portal + spawner) ───────────────────────────────────
+  jupyterhub:
+    build:
+      context: .
+      dockerfile: hub.Dockerfile
+    ports:
+      - "8000:8000"    # Public JupyterHub UI (point Cloudflare tunnel here)
+    volumes:
+      - ./jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro
+      - /var/run/docker.sock:/var/run/docker.sock   # DockerSpawner needs this
+      - jupyterhub-data:/data
+    networks:
+      - ml-net
+    environment:
+      - DOCKER_NETWORK_NAME=ml-net
+      - RAY_ADDRESS=ray://ray-head:10001
+    depends_on:
+      - ray-head
+    restart: unless-stopped
