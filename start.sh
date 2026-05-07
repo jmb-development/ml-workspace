@@ -4,14 +4,11 @@ set -e
 echo "==> Building JupyterHub image..."
 docker build -t jupyterhub-hub:latest -f hub.Dockerfile .
 
-echo "==> Building Ray image (downloads PyTorch CUDA — takes a few minutes)..."
-docker build -t ml-ray:latest -f ray.Dockerfile .
-
 echo "==> Building notebook image..."
 docker build -t ml-notebook:latest -f notebook.Dockerfile .
 
-echo "==> Starting Ray + JupyterHub..."
-docker compose up -d
+echo "==> Building and starting all services..."
+docker compose up -d --build
 
 echo ""
 echo "Done."
