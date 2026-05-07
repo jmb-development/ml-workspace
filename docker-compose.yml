@@ -13,14 +13,17 @@ services:
       context: .
       dockerfile: ray.Dockerfile
     image: ml-ray:latest
-    command: >
+    command: >-
       bash -c "ray start --head
-                         --dashboard-host=0.0.0.0
-                         --dashboard-port=8265
-                         --ray-client-server-port=10001
-                         --block"
+      --dashboard-host=0.0.0.0
+      --dashboard-port=8265
+      --ray-client-server-port=10001
+      --block"
+    shm_size: '8gb'
     ports:
       - "8265:8265"    # Ray dashboard  (expose via Cloudflare tunnel if desired)
+    environment:
+      - RAY_DISABLE_DASHBOARD_HOST_CHECK=1
     networks:
       - ml-net
     restart: unless-stopped

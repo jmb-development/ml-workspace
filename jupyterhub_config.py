@@ -17,7 +17,7 @@ c.DockerSpawner.remove = True
 # Persistent work directory per user — Docker named volume, auto-created on first login.
 # Adding a new user requires zero manual volume setup.
 c.DockerSpawner.volumes = {
-    "jupyterhub-user-{username}": "/home/jovyan/work"
+    "jupyterhub-user-{username}": "/home/jovyan"
 }
 
 # Every notebook container knows how to talk to Ray
