@@ -37,6 +37,7 @@ c.NativeAuthenticator.open_signup = False
 
 # Bootstrap: the first admin. Add yourself here. You can promote others in the UI.
 c.Authenticator.admin_users = {"john"}
+c.Authenticator.allowed_users = {"john"}
 
 # Admins can open any user's notebook for debugging
 c.JupyterHub.admin_access = True
